@@ -230,15 +230,20 @@ def run_check():
 
 
 def main():
-    signal.signal(signal.SIGINT, lambda *_: (console.print("\n[dim]모니터링 종료[/]"), sys.exit(0)))
+    # --once 옵션: 1회 실행 후 종료 (GitHub Actions용)
+    once = "--once" in sys.argv
 
-    console.print(f"[bold cyan]Claude Status Monitor 시작[/]")
-    console.print(f"[dim]체크 간격: {CHECK_INTERVAL // 60}분 | Ctrl+C로 종료[/]")
-
-    while True:
+    if once:
         run_check()
-        console.print(f"\n[dim]다음 체크: {CHECK_INTERVAL // 60}분 후...[/]")
-        time.sleep(CHECK_INTERVAL)
+    else:
+        signal.signal(signal.SIGINT, lambda *_: (console.print("\n[dim]모니터링 종료[/]"), sys.exit(0)))
+        console.print(f"[bold cyan]Claude Status Monitor 시작[/]")
+        console.print(f"[dim]체크 간격: {CHECK_INTERVAL // 60}분 | Ctrl+C로 종료[/]")
+
+        while True:
+            run_check()
+            console.print(f"\n[dim]다음 체크: {CHECK_INTERVAL // 60}분 후...[/]")
+            time.sleep(CHECK_INTERVAL)
 
 
 if __name__ == "__main__":
